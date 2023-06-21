@@ -1,0 +1,121 @@
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv('diabetes_prediction_dataset.csv')
+data.head()
+
+data.isnull().sum()
+
+data.loc[data.diabetes == 1]
+
+data.corr()
+
+sns.heatmap(data.corr(), cmap='coolwarm', annot=True)
+
+\\EDA
+
+smoker_data = data['smoking_history'].value_counts()
+ax = sns.barplot(x = smoker_data.index, y = smoker_data.values)
+for i in ax.containers:
+    ax.bar_label(i,)
+plt.title('Smoking History', size=15)
+plt.xlabel('smoking history')
+plt.ylabel('count')
+plt.show()
+
+ax = sns.countplot(data=data, x = 'smoking_history', hue = 'diabetes')
+for i in ax.containers:
+    ax.bar_label(i,)
+plt.title('Relating smoking history and diabetes', size=15)
+plt.show()
+
+ax = sns.countplot(data=data, x = 'hypertension', hue = 'diabetes')
+for i in ax.containers:
+    ax.bar_label(i,)
+plt.title('Relating hypertension and diabetes', size=15)
+plt.show()
+
+ax = sns.countplot(data=data, x = 'heart_disease', hue = 'diabetes')
+for i in ax.containers:
+    ax.bar_label(i,)
+plt.title('Relating heart disease and diabetes', size=15)
+plt.show()
+
+ax = sns.countplot(data=data, x = 'gender', hue = 'diabetes')
+for i in ax.containers:
+    ax.bar_label(i,)
+plt.title('Relating gender and diabetes', size=15)
+plt.show()
+
+features = ['heart_disease', 'hypertension', 'bmi', 'HbA1c_level', 'blood_glucose_level', 'gender', 'smoking_history']
+X = pd.get_dummies(data[features])
+y = data['diabetes']
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.7, random_state=42)
+
+X_train.shape, X_test.shape
+
+\\RANDOM FOREST
+
+from sklearn.ensemble import RandomForestClassifier
+classifier = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+classifier.fit(X_train, y_train)
+
+predictions = classifier.predict(X_test)
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test, predictions)
+
+\\SVM
+
+from sklearn import svm
+
+clf = svm.SVC(kernel='linear')
+
+# Train the classifier on the training data
+clf.fit(X_train, y_train)
+
+# Use the trained classifier to make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# Calculate the accuracy of the classifier on the test data
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+\\KNN
+
+from sklearn.neighbors import KNeighborsClassifier
+# Initialize the K-nearest neighbors classifier
+knn = KNeighborsClassifier(n_neighbors=3)
+
+# Train the classifier on the training data
+knn.fit(X_train, y_train)
+
+# Make predictions on the testing data
+y_pred = knn.predict(X_test)
+
+# Calculate the accuracy of the classifier
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy}")
+
+\\LOGISTIC REGRESSION
+
+from sklearn.linear_model import LogisticRegression
+
+# create the classifier
+clf = LogisticRegression()
+
+# train the classifier on the training data
+clf.fit(X_train, y_train)
+
+# use the trained classifier to make predictions on the test data
+y_pred = clf.predict(X_test)
+
+# calculate the accuracy of the classifier
+accuracy = clf.score(X_test, y_test)
+
+# print the accuracy
+print("Accuracy:", accuracy)
